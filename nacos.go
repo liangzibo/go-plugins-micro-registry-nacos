@@ -85,6 +85,10 @@ func configure(c *nacosRegistry, opts ...registry.Option) error {
 		c.opts.Timeout = time.Second * 1
 	}
 	clientConfig.TimeoutMs = uint64(c.opts.Timeout.Milliseconds())
+	//增加命名空间
+	if len(nacosConfigTmp.NamespaceId) > 0 {
+		clientConfig.NamespaceId = nacosConfigTmp.NamespaceId
+	}
 	client, err := clients.CreateNamingClient(map[string]interface{}{
 		"serverConfigs": serverConfigs,
 		"clientConfig":  clientConfig,
@@ -251,4 +255,11 @@ func NewRegistry(opts ...registry.Option) registry.Registry {
 	}
 	configure(nacos, opts...)
 	return nacos
+}
+
+var nacosConfigTmp = constant.ClientConfig{}
+
+//赋值
+func SetNamespaceId(namespaceId string) {
+	nacosConfigTmp.NamespaceId = namespaceId
 }
