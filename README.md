@@ -15,3 +15,5 @@ go get github.com/liangzibo/go-plugins-micro-registry-nacos/v2
 ```
 
 # 案例
+
+https://github.com/foxiswho/go-micro-nacos-demo
