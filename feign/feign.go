@@ -27,34 +27,42 @@ func NewClient() *httpclient.HttpClient {
 	}
 	return hp
 }
+
 //转换
 func ConvertServiceToUrl(address string) string {
 	return "http://" + address
 }
+
 //组装
 func AssembleUrl(service, path string) string {
 	return ConvertServiceToUrl(service) + path
 }
+
 //普通 GET
 func Get(url string, headers map[string]string) (*httpclient.Response, error) {
 	return NewClient().WithHeaders(headers).Get(url)
 }
+
 //普通
 func Post(url string, param url.Values, headers map[string]string) (*httpclient.Response, error) {
 	return NewClient().WithHeaders(headers).Post(url, param)
 }
+
 //普通
 func PostJson(url string, data interface{}, headers map[string]string) (*httpclient.Response, error) {
 	return NewClient().WithHeaders(headers).PostJson(url, data)
 }
+
 //普通
 func PutJson(url string, data interface{}, headers map[string]string) (*httpclient.Response, error) {
 	return NewClient().WithHeaders(headers).PutJson(url, data)
 }
+
 //普通
 func Delete(url string, headers map[string]string, params ...interface{}) (*httpclient.Response, error) {
 	return NewClient().WithHeaders(headers).Delete(url, params)
 }
+
 // 获取服务
 func GetServiceAddr(r registry.Registry, serviceName string) (string, error) {
 	var retryCount int
@@ -84,9 +92,10 @@ func GetServiceAddr(r registry.Registry, serviceName string) (string, error) {
 		}
 	}
 }
+
 // 获取服务 GET
-func GetFeign(r registry.Registry, serviceName, path string, headers map[string]string) (string, error) {
-	addr, err := GetServiceAddr(r, serviceName)
+func GetFeign(opt Options, path string, headers map[string]string) (string, error) {
+	addr, err := GetServiceAddr(opt.Registry, opt.Service)
 	if err != nil {
 		return "", err
 	}
@@ -104,16 +113,17 @@ func GetFeign(r registry.Registry, serviceName, path string, headers map[string]
 	}
 	return string(bytes), nil
 }
+
 // 获取服务 POST
-func PostFeign(r registry.Registry, serviceName, path string, param url.Values, headers map[string]string) (string, error) {
-	addr, err := GetServiceAddr(r, serviceName)
+func PostFeign(opt Options, path string, param url.Values, headers map[string]string) (string, error) {
+	addr, err := GetServiceAddr(opt.Registry, opt.Service)
 	if err != nil {
 		return "", err
 	}
 	if len(addr) <= 0 {
 		return "", errors.New("服务不存在")
 	}
-	url := AssembleUrl(serviceName, path)
+	url := AssembleUrl(addr, path)
 	rsp, err := Post(url, param, headers)
 	if err != nil {
 		return "", err
@@ -124,9 +134,10 @@ func PostFeign(r registry.Registry, serviceName, path string, param url.Values, 
 	}
 	return string(bytes), nil
 }
+
 // 获取服务 POSTJSON
-func PostJsonFeign(r registry.Registry, serviceName, path string, data interface{}, headers map[string]string) (string, error) {
-	addr, err := GetServiceAddr(r, serviceName)
+func PostJsonFeign(opt Options, path string, data interface{}, headers map[string]string) (string, error) {
+	addr, err := GetServiceAddr(opt.Registry, opt.Service)
 	if err != nil {
 		return "", err
 	}
@@ -144,9 +155,10 @@ func PostJsonFeign(r registry.Registry, serviceName, path string, data interface
 	}
 	return string(bytes), nil
 }
+
 // 获取服务 PUTJSON
-func PutJsonFeign(r registry.Registry, serviceName, path string, data interface{}, headers map[string]string) (string, error) {
-	addr, err := GetServiceAddr(r, serviceName)
+func PutJsonFeign(opt Options, path string, data interface{}, headers map[string]string) (string, error) {
+	addr, err := GetServiceAddr(opt.Registry, opt.Service)
 	if err != nil {
 		return "", err
 	}
@@ -164,9 +176,10 @@ func PutJsonFeign(r registry.Registry, serviceName, path string, data interface{
 	}
 	return string(bytes), nil
 }
+
 // 获取服务 DELETE
-func DeleteFeign(r registry.Registry, serviceName, path string, headers map[string]string, params ...interface{}) (string, error) {
-	addr, err := GetServiceAddr(r, serviceName)
+func DeleteFeign(opt Options, path string, headers map[string]string, params ...interface{}) (string, error) {
+	addr, err := GetServiceAddr(opt.Registry, opt.Service)
 	if err != nil {
 		return "", err
 	}
